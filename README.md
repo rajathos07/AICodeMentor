@@ -30,7 +30,7 @@ This project demonstrates how to build a powerful AI-powered web application usi
 
 1. Clone this repository:
     ```bash
-    git clone https://github.com/shanmukhaprajwal1122/AI-codereviewer-learning.git
+    git clone https://github.com/rajathos07/AICodeMentor.git
     cd AI-codereviewer-learning
     ```
 
