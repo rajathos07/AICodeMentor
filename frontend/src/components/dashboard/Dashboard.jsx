@@ -14,6 +14,16 @@ function getInitials(name = "") {
 
 const COLORS = ["#60a5fa", "#a78bfa", "#ec4899", "#10b981", "#f59e0b", "#ef4444"];
 
+// Suppress recharts warnings
+if (typeof window !== 'undefined') {
+  const originalWarn = console.warn;
+  console.warn = (...args) => {
+    const str = String(args[0]);
+    if (str.includes('width') && str.includes('height') && str.includes('chart')) return;
+    originalWarn(...args);
+  };
+}
+
 export default function Dashboard({ user, onLogout, onSelectNav }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [progress, setProgress] = useState(null);
@@ -59,7 +69,7 @@ export default function Dashboard({ user, onLogout, onSelectNav }) {
   const weeklyData = generateWeeklyData(activities);
   const difficultyData = generateDifficultyData(progress);
   const activityTypeData = generateActivityTypeData(activities);
-    const streakData = generateStreakData(progress);
+  const streakData = generateStreakData(progress);
 
   return (
     <div className="min-h-screen px-5 py-6">
@@ -173,9 +183,9 @@ export default function Dashboard({ user, onLogout, onSelectNav }) {
               <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
                 Weekly Activity
               </h3>
-              <div className="h-64">
+              <div style={{ width: '100%', height: '300px', minWidth: '0' }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={weeklyData}>
+                  <AreaChart data={weeklyData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorXp" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.8}/>
@@ -208,9 +218,9 @@ export default function Dashboard({ user, onLogout, onSelectNav }) {
               <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
                 Challenge Difficulty Breakdown
               </h3>
-              <div className="h-64 flex items-center justify-center">
+              <div style={{ width: '100%', height: '300px', minWidth: '0' }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
+                  <PieChart margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                     <Pie
                       data={difficultyData}
                       cx="50%"
@@ -250,9 +260,9 @@ export default function Dashboard({ user, onLogout, onSelectNav }) {
               <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
                 Activity Overview
               </h3>
-              <div className="h-64">
+              <div style={{ width: '100%', height: '300px', minWidth: '0' }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={activityTypeData} layout="vertical">
+                  <BarChart data={activityTypeData} layout="vertical" margin={{ top: 10, right: 30, left: 100, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                     <XAxis type="number" stroke="#9ca3af" fontSize={12} />
                     <YAxis type="category" dataKey="name" stroke="#9ca3af" fontSize={12} width={100} />
@@ -279,9 +289,9 @@ export default function Dashboard({ user, onLogout, onSelectNav }) {
               <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
                 Skill Progress
               </h3>
-              <div className="h-64">
+              <div style={{ width: '100%', height: '300px', minWidth: '0' }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <RadialBarChart cx="50%" cy="50%" innerRadius="20%" outerRadius="90%" data={streakData} startAngle={180} endAngle={0}>
+                  <RadialBarChart cx="50%" cy="50%" innerRadius="20%" outerRadius="90%" data={streakData} startAngle={180} endAngle={0} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                     <RadialBar
                       minAngle={15}
                       background
@@ -427,7 +437,6 @@ function generateWeeklyData(activities = []) {
       return actDate === dateStr;
     });
 
-    // Estimate XP: 10 XP per activity if not specified
     const estimatedXp = dayActivities.reduce((acc, curr) => {
       return acc + (curr.details?.xp || 10);
     }, 0);
@@ -444,12 +453,11 @@ function generateDifficultyData(progress) {
   const completed = progress?.completedChallengeIds?.length || 0;
   if (completed === 0) {
     return [
-      { name: "Easy", value: 0 },
-      { name: "Medium", value: 0 },
-      { name: "Hard", value: 0 }
+      { name: "Easy", value: 1 },
+      { name: "Medium", value: 1 },
+      { name: "Hard", value: 1 }
     ];
   }
-  // If we don't have difficulty in the model, we distribute based on progress
   return [
     { name: "Easy", value: Math.ceil(completed * 0.6) },
     { name: "Medium", value: Math.ceil(completed * 0.3) },
@@ -458,14 +466,14 @@ function generateDifficultyData(progress) {
 }
 
 function generateActivityTypeData(activities = []) {
-  const codeReviews = activities.filter(a => a.action === "code_review").length;
-  const quizzes = activities.filter(a => a.action === "quiz_session").length;
-  const uploads = activities.filter(a => a.action === "file_upload").length;
+  const codeReviews = activities.filter(a => a.action === "code_review").length || 0;
+  const quizzes = activities.filter(a => a.action === "quiz_session").length || 0;
+  const uploads = activities.filter(a => a.action === "file_upload").length || 0;
   
   return [
-    { name: "Code Reviews", count: codeReviews },
-    { name: "Quiz Sessions", count: quizzes },
-    { name: "File Uploads", count: uploads }
+    { name: "Code Reviews", count: codeReviews || 0 },
+    { name: "Quiz Sessions", count: quizzes || 0 },
+    { name: "File Uploads", count: uploads || 0 }
   ];
 }
 
@@ -474,8 +482,8 @@ function generateStreakData(progress) {
   const completed = progress?.completedChallengeIds?.length || 0;
   
   return [
-    { name: "Problem Solving", value: Math.min(100, completed * 10), fill: "#60a5fa" },
-    { name: "Code Quality", value: Math.min(100, (totalXP / 500) * 100), fill: "#a78bfa" },
-    { name: "Learning Progress", value: Math.min(100, (progress?.badges?.length || 0) * 20), fill: "#ec4899" }
+    { name: "Problem Solving", value: Math.max(1, Math.min(100, completed * 10)), fill: "#60a5fa" },
+    { name: "Code Quality", value: Math.max(1, Math.min(100, (totalXP / 500) * 100)), fill: "#a78bfa" },
+    { name: "Learning Progress", value: Math.max(1, Math.min(100, (progress?.badges?.length || 0) * 20)), fill: "#ec4899" }
   ];
 }

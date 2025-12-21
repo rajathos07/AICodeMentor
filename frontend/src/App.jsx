@@ -82,6 +82,7 @@ class ErrorBoundary extends React.Component {
 }
 
 /* ---------- Diagram Generator Component ---------- */
+/* ---------- Diagram Generator Component ---------- */
 function DiagramGenerator({ code, language }) {
   const [diagramType, setDiagramType] = useState("class");
   const [diagram, setDiagram] = useState("");
@@ -172,7 +173,61 @@ function DiagramGenerator({ code, language }) {
       <div className="p-5 border-b border-purple-500/20">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-3">
-            <div className="text-2xl">📊</div>
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-10 h-10">
+              <defs>
+                <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style={{stopColor:'#3b82f6',stopOpacity:1}} />
+                  <stop offset="50%" style={{stopColor:'#8b5cf6',stopOpacity:1}} />
+                  <stop offset="100%" style={{stopColor:'#ec4899',stopOpacity:1}} />
+                </linearGradient>
+                <linearGradient id="nodeGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style={{stopColor:'#60a5fa',stopOpacity:1}} />
+                  <stop offset="100%" style={{stopColor:'#3b82f6',stopOpacity:1}} />
+                </linearGradient>
+                <linearGradient id="nodeGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style={{stopColor:'#a78bfa',stopOpacity:1}} />
+                  <stop offset="100%" style={{stopColor:'#8b5cf6',stopOpacity:1}} />
+                </linearGradient>
+                <linearGradient id="nodeGradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style={{stopColor:'#ec4899',stopOpacity:1}} />
+                  <stop offset="100%" style={{stopColor:'#db2777',stopOpacity:1}} />
+                </linearGradient>
+                <linearGradient id="nodeGradient4" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style={{stopColor:'#10b981',stopOpacity:1}} />
+                  <stop offset="100%" style={{stopColor:'#059669',stopOpacity:1}} />
+                </linearGradient>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+                <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.4"/>
+                </filter>
+              </defs>
+              <circle cx="100" cy="100" r="95" fill="url(#bgGradient)" filter="url(#shadow)"/>
+              <circle cx="100" cy="100" r="95" fill="none" stroke="#ffffff" strokeWidth="2" opacity="0.2"/>
+              <g strokeWidth="3" opacity="0.7" filter="url(#glow)">
+                <line x1="100" y1="50" x2="60" y2="120" stroke="#60a5fa"/>
+                <line x1="100" y1="50" x2="140" y2="120" stroke="#a78bfa"/>
+                <line x1="60" y1="120" x2="100" y2="160" stroke="#ec4899"/>
+                <line x1="140" y1="120" x2="100" y2="160" stroke="#10b981"/>
+              </g>
+              <circle cx="100" cy="100" r="16" fill="url(#nodeGradient1)" filter="url(#shadow)"/>
+              <circle cx="100" cy="100" r="16" fill="none" stroke="#ffffff" strokeWidth="2" opacity="0.4"/>
+              <circle cx="100" cy="50" r="14" fill="url(#nodeGradient1)" filter="url(#shadow)"/>
+              <circle cx="100" cy="50" r="14" fill="none" stroke="#ffffff" strokeWidth="1.5" opacity="0.3"/>
+              <circle cx="60" cy="120" r="12" fill="url(#nodeGradient2)" filter="url(#shadow)"/>
+              <circle cx="60" cy="120" r="12" fill="none" stroke="#ffffff" strokeWidth="1.5" opacity="0.3"/>
+              <circle cx="140" cy="120" r="12" fill="url(#nodeGradient3)" filter="url(#shadow)"/>
+              <circle cx="140" cy="120" r="12" fill="none" stroke="#ffffff" strokeWidth="1.5" opacity="0.3"/>
+              <circle cx="100" cy="160" r="12" fill="url(#nodeGradient4)" filter="url(#shadow)"/>
+              <circle cx="100" cy="160" r="12" fill="none" stroke="#ffffff" strokeWidth="1.5" opacity="0.3"/>
+              <circle cx="100" cy="100" r="28" fill="none" stroke="#ffffff" strokeWidth="1" opacity="0.15"/>
+              <circle cx="100" cy="100" r="45" fill="none" stroke="#ffffff" strokeWidth="1" opacity="0.1"/>
+            </svg>
             <h2 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
               AI Diagram Generator
             </h2>

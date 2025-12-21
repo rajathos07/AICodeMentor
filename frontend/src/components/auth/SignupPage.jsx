@@ -48,10 +48,12 @@ const API_BASE = (() => {
     debounceRef.current = setTimeout(async () => {
       try {
         const resp = await fetch(`${API_BASE}/api/auth/check-username`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username }),
-        });
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include", // ✅ ADD THIS
+             body: JSON.stringify({ username }),
+            });
+
         const data = await resp.json();
         if (data && data.ok) setUsernameAvailable(!!data.available);
       } catch (err) {

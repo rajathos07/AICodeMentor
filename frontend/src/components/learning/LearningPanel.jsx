@@ -333,6 +333,7 @@ export default function LearningPanel({ user, onLogout }) {
           setSidebarOpen(false);
           if (key === "mentor") window.dispatchEvent(new CustomEvent("route", { detail: "editor" }));
           if (key === "quiz") window.dispatchEvent(new CustomEvent("route", { detail: "quiz" }));
+          if (key === "dashboard") window.dispatchEvent(new CustomEvent("route", { detail: "dashboard" }));
         }}
         user={user}
         onLogout={onLogout}

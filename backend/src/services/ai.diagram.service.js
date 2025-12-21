@@ -96,7 +96,7 @@ async function generateDiagram(code, language, diagramType) {
   }
 
   const chatCompletion = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile",  // ✅ CHANGED: Updated to active model
+    model: "llama-3.3-70b-versatile",  // âœ… CHANGED: Updated to active model
     messages: [
       {
         role: "system",
