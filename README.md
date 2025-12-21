@@ -68,7 +68,7 @@ This project demonstrates how to build a powerful AI-powered web application usi
     - Backend: `http://localhost:3000/ai/get-review`
 
 ## Code & Resources:
-- GitHub Repo: [AI-codereviewer-learning](https://github.com/shanmukhaprajwal1122/AI-codereviewer-learning.git)
+- GitHub Repo: [AI-codereviewer-learning](https://github.com/rajathos07/AICodeMentor.git)
 - Groq API Docs: [Groq API Docs](https://groq.com/docs)
 - Node.js Docs: [Node.js Docs](https://nodejs.org/en)
 - Tailwind CSS Docs: [Tailwind CSS Docs](https://v3.tailwindcss.com/docs/guides/vite)
