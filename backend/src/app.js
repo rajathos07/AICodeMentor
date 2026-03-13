@@ -12,27 +12,30 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* ========= CORS Setup ========= */
-const FRONTEND_URL =
-  process.env.FRONTEND_URL || "http://localhost:5173";
+
+// ========= CORS Setup =========
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:3000",
   "https://ai-code-mentor.vercel.app",
   ...(FRONTEND_URL ? [FRONTEND_URL.replace(/\/$/, "")] : []),
 ];
 
-// Allow all Vercel preview deployment URLs for this project
+// Allow ALL Vercel preview deployment URLs for this project
 const allowedOriginPatterns = [
-  /^https:\/\/ai-code-mentor.*\.vercel\.app$/,
+  /^https:\/\/ai-code-mentor.*\.vercel\.app$/, // This should work!
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      const cleanOrigin = origin ? origin.replace(/\/$/, "") : origin;
+      if (!origin) return callback(null, true); // Allow no-origin requests (like mobile apps, curl)
+      
+      const cleanOrigin = origin.replace(/\/$/, "");
+      
       const isAllowed =
-        !cleanOrigin ||
         allowedOrigins.includes(cleanOrigin) ||
         allowedOriginPatterns.some((pattern) => pattern.test(cleanOrigin));
 
@@ -48,6 +51,8 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+app.options("*", cors());
 
 /* Handle preflight requests */
 app.options("*", cors());
