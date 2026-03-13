@@ -52,12 +52,12 @@ body {
 }
 
 /* ---------- Axios base ---------- */
-const API_BASE =
-  (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_BASE) ||
-  (typeof process !== "undefined" && process.env?.VITE_API_BASE) ||
-  "http://localhost:3000";
+/* ---------- Axios base ---------- */
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3000";
+
 axios.defaults.baseURL = API_BASE;
 axios.defaults.withCredentials = true;
+axios.defaults.headers.common["Content-Type"] = "application/json";
 
 /* ---------- Helpers ---------- */
 const LOGIN_FIRST_ALWAYS = false;
