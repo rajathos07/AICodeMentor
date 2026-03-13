@@ -53,7 +53,7 @@ body {
 
 /* ---------- Axios base ---------- */
 /* ---------- Axios base ---------- */
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3000";
+const API_BASE = import.meta.env.VITE_API_BASE || "https://ai-code-mentor-backend-dxn7.onrender.com";
 
 axios.defaults.baseURL = API_BASE;
 axios.defaults.withCredentials = true;
