@@ -22,11 +22,21 @@ const allowedOrigins = [
   ...(FRONTEND_URL ? [FRONTEND_URL.replace(/\/$/, "")] : []),
 ];
 
+// Allow all Vercel preview deployment URLs for this project
+const allowedOriginPatterns = [
+  /^https:\/\/ai-code-mentor.*\.vercel\.app$/,
+];
+
 app.use(
   cors({
     origin: function (origin, callback) {
       const cleanOrigin = origin ? origin.replace(/\/$/, "") : origin;
-      if (!cleanOrigin || allowedOrigins.includes(cleanOrigin)) {
+      const isAllowed =
+        !cleanOrigin ||
+        allowedOrigins.includes(cleanOrigin) ||
+        allowedOriginPatterns.some((pattern) => pattern.test(cleanOrigin));
+
+      if (isAllowed) {
         callback(null, true);
       } else {
         console.error("❌ CORS blocked origin:", cleanOrigin);
