@@ -69,7 +69,7 @@ mongoose
 /* ========= Config ========= */
 const SESSION_SECRET =
   process.env.SESSION_SECRET ||
-  "your-secret-key-change-in-production-please";
+  "192377f7d78fcf8bbac30d23117281f2719c47f0559970c78c1d8bfc676fa0a479538b0d3c636e16bc943755da0372db143a5e03fe7f2e9ebc48cd498a56f54a";
 
 const NODE_ENV = process.env.NODE_ENV || "development";
 
