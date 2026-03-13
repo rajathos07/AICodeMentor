@@ -19,15 +19,17 @@ const FRONTEND_URL =
 const allowedOrigins = [
   "http://localhost:5173",
   "https://ai-code-mentor.vercel.app",
-  FRONTEND_URL
+  ...(FRONTEND_URL ? [FRONTEND_URL.replace(/\/$/, "")] : []),
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      const cleanOrigin = origin ? origin.replace(/\/$/, "") : origin;
+      if (!cleanOrigin || allowedOrigins.includes(cleanOrigin)) {
         callback(null, true);
       } else {
+        console.error("❌ CORS blocked origin:", cleanOrigin);
         callback(new Error("CORS not allowed"));
       }
     },
