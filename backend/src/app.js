@@ -13,25 +13,29 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-// ========= CORS Setup =========
+/* ========= CORS Setup ========= */
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
   "https://ai-code-mentor.vercel.app",
-  ...(FRONTEND_URL ? [FRONTEND_URL.replace(/\/$/, "")] : []),
 ];
+
+// Add FRONTEND_URL if it's set
+if (FRONTEND_URL && !allowedOrigins.includes(FRONTEND_URL)) {
+  allowedOrigins.push(FRONTEND_URL);
+}
 
 // Allow ALL Vercel preview deployment URLs for this project
 const allowedOriginPatterns = [
-  /^https:\/\/ai-code-mentor.*\.vercel\.app$/, // This should work!
+  /^https:\/\/ai-code-mentor(-[a-z0-9]+)*\.vercel\.app$/, // Matches all preview + production
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // Allow no-origin requests (like mobile apps, curl)
+      if (!origin) return callback(null, true);
       
       const cleanOrigin = origin.replace(/\/$/, "");
       
@@ -43,6 +47,7 @@ app.use(
         callback(null, true);
       } else {
         console.error("❌ CORS blocked origin:", cleanOrigin);
+        console.log("✅ Allowed origins:", allowedOrigins);
         callback(new Error("CORS not allowed"));
       }
     },
