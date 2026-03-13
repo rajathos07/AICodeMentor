@@ -189,5 +189,15 @@ app.use((err, req, res, next) => {
   });
 });
 
+app.get("/health", (_req, res) => {
+  res.json({
+    status: "ok",
+    port: process.env.PORT || 3000,
+    mongodb:
+      mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 /* ========= Export ========= */
 module.exports = app;
