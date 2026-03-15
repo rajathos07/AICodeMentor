@@ -164,7 +164,7 @@ export default function LearningPanel({ user, onLogout }) {
 
     for (let i = 0; i < attempts; i++) {
       try {
-        const res = await fetch(`${API}/ai/learning/challenge`, {
+        const res = await fetch(`${API}/api/learning/challenge`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ topic, difficulty, language, excludeIds }),
