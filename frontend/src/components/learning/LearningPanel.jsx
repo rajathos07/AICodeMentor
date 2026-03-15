@@ -164,7 +164,7 @@ export default function LearningPanel({ user, onLogout }) {
 
     for (let i = 0; i < attempts; i++) {
       try {
-        const res = await fetch(`${API}/ai/generate-challenge`, {
+        const res = await fetch(`${API}/ai/learning/challenge`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ topic, difficulty, language, excludeIds }),
@@ -229,7 +229,7 @@ export default function LearningPanel({ user, onLogout }) {
     setRunning(true); setFeedback(""); setAwardMsg(""); setResults([]); setStatus("idle");
 
     try {
-      const res = await fetch(`${API}/ai/run-tests`, {
+      const res = await fetch(`${API}/api/learning/run-tests`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
