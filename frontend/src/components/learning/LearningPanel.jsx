@@ -15,11 +15,11 @@ function getInitials(name = "") {
   return parts.slice(0, 2).map((p) => p[0]?.toUpperCase()).join("") || "U";
 }
 
-// FIX 3: VITE_API_BASE matches the env var set in Vercel (was falling back to localhost:3000)
+// FIX: previous fallback used window.location.hostname which resolves to the Vercel frontend
+// domain on production, causing all API calls to 404. Now falls back to the Railway backend URL.
 const API =
   import.meta?.env?.VITE_API_BASE ||
-  import.meta?.env?.VITE_API_BASE_URL ||
-  "";
+  "https://ai-code-mentor-backend-dxn7.o.railway.app";
 
 const LANG_OPTIONS = [
   { value: "python", label: "Python", prism: "python", icon: "🐍" },
@@ -233,8 +233,7 @@ export default function LearningPanel({ user, onLogout }) {
     setRunning(true); setFeedback(""); setAwardMsg(""); setResults([]); setStatus("idle");
 
     try {
-      // FIX 4: was calling /ai/run-tests (wrong), corrected to /api/learning/run-tests
-      const res = await fetch(`${API}/api/learning/run-tests`, {
+      const res = await fetch(`${API}/ai/run-tests`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -242,8 +241,6 @@ export default function LearningPanel({ user, onLogout }) {
           functionName: challenge.functionName,
           code,
           testCases: challenge.testCases,
-          challengeId: challenge.id,
-          username,
         }),
       });
       
