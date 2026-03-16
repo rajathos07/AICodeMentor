@@ -12,55 +12,15 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-/* ========= CORS Setup ========= */
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
-
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:3000",
-  "https://ai-code-mentor.vercel.app",
-];
-
-// Add FRONTEND_URL if it's set
-if (FRONTEND_URL && !allowedOrigins.includes(FRONTEND_URL)) {
-  allowedOrigins.push(FRONTEND_URL);
-}
-
-// Allow ALL Vercel preview deployment URLs for this project
-const allowedOriginPatterns = [
-  /^https:\/\/ai-code-mentor(-[a-z0-9]+)*\.vercel\.app$/, // Matches all preview + production
-];
-
+// ✅ CORS setup
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-      
-      const cleanOrigin = origin.replace(/\/$/, "");
-      
-      const isAllowed =
-        allowedOrigins.includes(cleanOrigin) ||
-        allowedOriginPatterns.some((pattern) => pattern.test(cleanOrigin));
-
-      if (isAllowed) {
-        callback(null, true);
-      } else {
-        console.error("❌ CORS blocked origin:", cleanOrigin);
-        console.log("✅ Allowed origins:", allowedOrigins);
-        callback(new Error("CORS not allowed"));
-      }
-    },
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-app.options("*", cors());
-
-/* Handle preflight requests */
-app.options("*", cors());
 
 /* ========= Database ========= */
 const MONGODB_URI =
@@ -78,9 +38,7 @@ mongoose
 
 /* ========= Config ========= */
 const SESSION_SECRET =
-  process.env.SESSION_SECRET ||
-  "192377f7d78fcf8bbac30d23117281f2719c47f0559970c78c1d8bfc676fa0a479538b0d3c636e16bc943755da0372db143a5e03fe7f2e9ebc48cd498a56f54a";
-
+  process.env.SESSION_SECRET || "your-secret-key-change-in-production-please";
 const NODE_ENV = process.env.NODE_ENV || "development";
 
 /* ========= Security Middlewares ========= */
@@ -91,7 +49,6 @@ try {
   helmet = null;
   console.warn("⚠️ helmet not installed — skipping");
 }
-
 try {
   rateLimit = require("express-rate-limit");
 } catch {
@@ -99,19 +56,17 @@ try {
   console.warn("⚠️ express-rate-limit not installed — skipping");
 }
 
-/* Render runs behind proxy */
 if (NODE_ENV === "production") app.set("trust proxy", 1);
 
 if (helmet) app.use(helmet());
 
 if (rateLimit) {
   const globalLimiter = rateLimit({
-    windowMs: 60 * 1000,
-    max: 120,
+    windowMs: 60 * 1000, // 1 minute
+    max: 120, // 120 req/min/IP
     standardHeaders: true,
     legacyHeaders: false,
   });
-
   app.use("/api/", globalLimiter);
   app.use("/ai/", globalLimiter);
 }
@@ -122,63 +77,53 @@ app.use(
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    rolling: true,
+    rolling: true, // refresh cookie expiry
     name: "sessionId",
-
     store: MongoStore.create({
       mongoUrl: MONGODB_URI,
       touchAfter: 24 * 3600,
       crypto: { secret: SESSION_SECRET },
       collectionName: "sessions",
-      ttl: 14 * 24 * 60 * 60,
+      ttl: 14 * 24 * 60 * 60, // 14 days
       autoRemove: "native",
     }),
-
     cookie: {
       secure: NODE_ENV === "production",
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 4,
-
-      /* Important for Vercel → Render cross-site cookies */
-      sameSite: NODE_ENV === "production" ? "none" : "lax",
-
-      domain:
-        NODE_ENV === "production"
-          ? process.env.COOKIE_DOMAIN
-          : undefined,
+      maxAge: 1000 * 60 * 60 * 4, // 4 hours
+      sameSite: NODE_ENV === "production" ? "strict" : "lax",
+      domain: NODE_ENV === "production" ? process.env.COOKIE_DOMAIN : undefined,
     },
   })
 );
 
 /* ========= Routes ========= */
 
-// AUTH ROUTES
+// ✅ AUTH ROUTES (required for login/signup)
 const authRoutes = require("./routes/auth.routes");
 app.use("/api/auth", authRoutes);
 console.log("   ✅ Auth routes loaded");
 
-// ACTIVITY
+// ✅ ACTIVITY
 const activityRoutes = require("./routes/activity.routes");
 app.use("/api/activity", activityRoutes);
 console.log("   ✅ Activity routes loaded");
 
-// AI ROUTES
+// ✅ AI (Review, Quiz, Groq)
+// FIX 2: Removed duplicate registration of ./routes/ai — was registered twice which caused conflicts
 app.use("/ai", require("./routes/ai.routes"));
 app.use("/ai", require("./routes/ai"));
 app.use("/ai", require("./routes/groq.routes"));
 console.log("   ✅ AI routes (review + quiz + Groq) loaded");
 
-// PROGRESS
+// ✅ PROGRESS
 const progressRoutes = require("./routes/progress.routes");
 app.use("/api/progress", progressRoutes);
 console.log("   ✅ Progress routes loaded");
 
-// QUIZ FLOW
-const aiQuizRoutes = require("./routes/ai");
-app.use("/ai", aiQuizRoutes);
-
-// LEARNING PANEL
+// ✅ LEARNING PANEL
 app.use("/api/learning", require("./routes/learning.routes"));
+console.log("   ✅ Learning routes loaded");
 
 /* ========= Health Check ========= */
 app.get("/health", (_req, res) => {
@@ -186,9 +131,7 @@ app.get("/health", (_req, res) => {
     status: "ok",
     port: process.env.PORT || 3000,
     mongodb:
-      mongoose.connection.readyState === 1
-        ? "connected"
-        : "disconnected",
+      mongoose.connection.readyState === 1 ? "connected" : "disconnected",
     timestamp: new Date().toISOString(),
   });
 });
@@ -200,41 +143,8 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   console.error("Error:", err.stack);
-
   const statusCode = err.status || err.statusCode || 500;
   const message = err.message || "Internal server error";
-
-  res.status(statusCode).json({
-    success: false,
-    message,
-    ...(NODE_ENV === "development" && { stack: err.stack }),
-  });
-});
-
-/* ========= Health Check ========= */
-app.get("/health", (_req, res) => {
-  res.json({
-    status: "ok",
-    port: process.env.PORT || 3000,
-    mongodb:
-      mongoose.connection.readyState === 1
-        ? "connected"
-        : "disconnected",
-    timestamp: new Date().toISOString(),
-  });
-});
-
-/* ========= 404 + Error Handling ========= */
-app.use((req, res) => {
-  res.status(404).json({ success: false, message: "Route not found" });
-});
-
-app.use((err, req, res, next) => {
-  console.error("Error:", err.stack);
-
-  const statusCode = err.status || err.statusCode || 500;
-  const message = err.message || "Internal server error";
-
   res.status(statusCode).json({
     success: false,
     message,
