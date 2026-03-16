@@ -15,11 +15,11 @@ function getInitials(name = "") {
   return parts.slice(0, 2).map((p) => p[0]?.toUpperCase()).join("") || "U";
 }
 
-// FIX: previous fallback used window.location.hostname which resolves to the Vercel frontend
-// domain on production, causing all API calls to 404. Now falls back to the Railway backend URL.
+// FIX: fallback now points to the correct Render backend URL
+// VITE_API_BASE must also be set in Vercel frontend env vars to this same value
 const API =
   import.meta?.env?.VITE_API_BASE ||
-  "https://ai-code-mentor-backend-dxn7.o.railway.app";
+  "https://ai-code-mentor-backend-dxn7.onrender.com";
 
 const LANG_OPTIONS = [
   { value: "python", label: "Python", prism: "python", icon: "🐍" },
