@@ -23,7 +23,8 @@ function badgeKey(topic, difficulty) {
 
 // GET /api/learning/challenge - Get a random challenge (excluding completed ones)
 // Query params: topic, difficulty, username
-router.get("/api/learning/challenge", async (req, res) => {
+// FIX 1: Removed "/api/learning" prefix — router is already mounted at /api/learning in app.js
+router.get("/challenge", async (req, res) => {
   try {
     const { topic, difficulty, username } = req.query;
     
@@ -74,8 +75,10 @@ router.get("/api/learning/challenge", async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to fetch challenge" });
   }
 });
+
 // POST /api/learning/run-tests - Run tests for a challenge
-router.post("/api/learning/run-tests", async (req, res) => {
+// FIX 1: Removed "/api/learning" prefix — router is already mounted at /api/learning in app.js
+router.post("/run-tests", async (req, res) => {
   try {
     const { challengeId, code, username } = req.body || {};
 
