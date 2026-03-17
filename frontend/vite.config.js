@@ -13,4 +13,28 @@ export default defineConfig({
     //   '/ai':  { target: 'http://localhost:3000', changeOrigin: true },
     // },
   },
+  build: {
+    // Suppress chunk size warnings — bundles are intentionally split below
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // React core — loads first, cached forever
+          "vendor-react":    ["react", "react-dom"],
+          // Animations — used on every page
+          "vendor-framer":   ["framer-motion"],
+          // HTTP client
+          "vendor-axios":    ["axios"],
+          // Code editor + syntax highlighting
+          "vendor-editor":   ["react-simple-code-editor", "prismjs"],
+          // Markdown renderer
+          "vendor-markdown": ["react-markdown"],
+          // Charts — only loaded on Dashboard page
+          "vendor-charts":   ["recharts"],
+          // Mermaid — ~500kB, lazy-imported so this chunk loads only when DiagramGenerator mounts
+          "vendor-mermaid":  ["mermaid"],
+        },
+      },
+    },
+  },
 })
